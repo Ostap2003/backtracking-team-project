@@ -1,14 +1,9 @@
 
 from pprint import pprint
-import pygame
-import time
 
 '''The module has class Grid for solving sudoku.
 Grid should be given as a list of integers or a path to a file.
 '''
-
-pygame.init()
-screen = pygame.display.set_mode((459, 459))
 
 class Grid():
     '''Class for solving sudoku.
@@ -27,25 +22,6 @@ class Grid():
         self.squares = []
         self.expand_data()
 
-    def show_sudoku(self):
-        '''Displays current grid (self.grid).
-        '''
-        x, y = 0, 0
-        for line in self.grid:
-            for num in line:
-                pygame.draw.rect(screen, 'green', pygame.Rect(x, y, 50, 50))
-                font = pygame.font.SysFont(None, 40)
-                img = font.render(str(num), True, 'black')
-                screen.blit(img, (x + 19, y + 12))
-                x += 51
-                if x == 153 or x == 308:
-                    x += 2
-                pygame.display.update()
-            y += 51
-            if y == 153 or y == 308:
-                y += 2
-            x = 0
-
     def read_and_convert_to_grid(self, path):
         '''Reads from file and writes info to list grid.
         '''
@@ -54,7 +30,6 @@ class Grid():
                 if line[-1] == '\n':
                     line = line[:-1]
                 self.grid.append([int(item) for item in line])
-            print(self.grid)
 
     def write_to_file(self):
         '''Writes solved sudoku to file 'solved_sudoku.txt'.
@@ -103,9 +78,6 @@ class Grid():
         '''Recursion, which solves sudoku.
         '''
 
-        self.show_sudoku()
-        time.sleep(0.0001)
-
         union = set(self.squares[col//3 + (row//3)*3]).union(set(self.grid[row]))
         union = union.union(self.columns[col])
 
@@ -127,7 +99,6 @@ class Grid():
                 self.columns[col][row] = i
                 self.squares[col//3 + (row//3)*3][(row % 3)*3 + (col % 3)] = i
                 if next_row == 9:
-                    self.show_sudoku()
                     return True
                 if self.solve_sudoku(next_row, next_col):
                     return True
@@ -147,7 +118,6 @@ class Grid():
 #          [0, 0, 0, 0, 0, 0, 0, 7, 4], 
 #          [0, 0, 5, 2, 0, 6, 3, 0, 0] ]
 
-# sudoku = Grid('grid_2.txt')
-# sudoku.solve_sudoku(0, 0)
-# sudoku.write_to_file()
-# time.sleep(5)
+sudoku = Grid('grid_2.txt')
+sudoku.solve_sudoku(0, 0)
+sudoku.write_to_file()
