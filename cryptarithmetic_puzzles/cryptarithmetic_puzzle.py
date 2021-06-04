@@ -1,5 +1,52 @@
 ''' Exhaustive Solve for Cryptarithmetic Puzzles'''
 
+class Croypto_Pyzzle:
+    '''An object that represents Cryptarithmetic Puzzle'''
+    def __init__(self, adders: list, add_result: str):
+        '''Takes and creates all needed arguments'''
+        self.adders = adders
+        self.add_result = add_result
+
+        # set prequirement arguments
+        self.letters_left = self.letters_to_assign()
+        self.digits_left = [num for num in '9876543210']
+
+        self.starting_letters = {word[0] for word in self.adders} | set(add_result[0])
+        self.result_dict = {letter: None for letter in self.letters_left}
+        self.result_dict['iterations'] = 0
+
+    def letters_to_assign(self):
+        '''Finds all unique letters needed to assign
+        >>> letters_to_assign(['HARD', 'WORK'], 'MONEY')
+        ['H', 'A', 'R', 'D', 'W', 'O', 'K', 'M', 'N', 'E', 'Y']
+        '''
+        all_letters = []
+        for word in self.adders + [self.add_result]:
+            for char in word:
+                if char not in all_letters:
+                    all_letters.append(char)
+        return all_letters
+
+    def check_solved_puzzle(self):
+        '''Checks if the result combination from the dict is suitable'''
+
+        adders = [self.to_digit(word) for word in self.adders]
+        add_result = self.to_digit(self.add_result)
+        return sum(adders) == add_result
+
+    def to_digit(self, word: str):
+        '''Translate a word into a digit
+        >>> res_dict = {'a':'1', 'b':'2', 'c':'3', 'd':'4'}
+        >>> to_digit('abcd', res_dict)
+        1234
+        '''
+        result = [self.result_dict[char] for char in word]
+        return int(''.join(result))
+    
+    def __str__(self):
+        '''Pretyly prints out Cryptarithmetic Puzzle'''
+        return f'{self.result_dict}'
+
 
 def read_puzzle_from_str(puzzle_str: str):
     '''Reads and transfers given puzzels into divided strings
@@ -38,60 +85,27 @@ def read_puzzle_from_file(path: str):
     return result
 
 
-def letters_to_assign(adders: list, add_result: str):
-    '''Finds all unique letters needed to assign
-    >>> letters_to_assign(['HARD', 'WORK'], 'MONEY')
-    ['H', 'A', 'R', 'D', 'W', 'O', 'K', 'M', 'N', 'E', 'Y']
-    '''
-    all_letters = []
-    for word in adders + [add_result]:
-        for char in word:
-            if char not in all_letters:
-                all_letters.append(char)
-    return all_letters
-
-
-def check_solved_puzzle(adders: list, add_result: str, result_dict: dict):
-    '''Checks if the result combination from the dict is suitable'''
-
-    adders = [to_digit(word, result_dict) for word in adders]
-    add_result = to_digit(add_result, result_dict)
-    return sum(adders) == add_result
-
-
-def to_digit(word: str, result_dict: dict):
-    '''Translate a word into a digit
-    >>> res_dict = {'a':'1', 'b':'2', 'c':'3', 'd':'4'}
-    >>> to_digit('abcd', res_dict)
-    1234
-    '''
-    result = [result_dict[char] for char in word]
-    return int(''.join(result))
-
-
 def exostive_solve(adders: list, add_result: str):
     '''Cryptarithmetic solver. Checks every possible combination for the thumb.'''
 
-    # set prequirement arguments
-    starting_letters = {word[0] for word in adders} | set(add_result[0])
-    letters_left = letters_to_assign(adders, add_result)
+    puzzle = Croypto_Pyzzle(adders, add_result)
 
-    if len(letters_left) > 10:
-        print(
-            f'Unvalid thumb {adders, add_result}: number of unique letters > 10')
+    # check the precontition of a puzzle
+    if len(puzzle.letters_left) > 10:
+        print(f'Unvalid thumb {adders, add_result}: number of unique letters > 10')
+        return
 
-    digits_left = [num for num in '9876543210']
-    res_dict = {letter: None for letter in letters_left}
-    res_dict['iterations'] = 0
+    letters_left = puzzle.letters_left
+    digits_left = puzzle.digits_left
 
     def exostive_solve_req(letters_left, digits_left):
         '''Help function iters through all the combinations'''
         # if there no digits to assign, it check if correct
         
         if letters_left == []:
-            if check_solved_puzzle(adders, add_result, res_dict):
+            if puzzle.check_solved_puzzle():
                 # hurray! it's a victory!
-                print(res_dict)
+                print(puzzle)
             return False
 
         # try all digits that left
@@ -100,21 +114,21 @@ def exostive_solve(adders: list, add_result: str):
             char = letters_left[0]
 
             # starting letters can't be zero
-            if (digit == '0') and (char in starting_letters):
+            if (digit == '0') and (char in puzzle.starting_letters):
                 continue
             
             # recurs through all variants
-            res_dict[char] = digit
+            puzzle.result_dict[char] = digit
             new_digits_left = digits_left[:idx] + digits_left[idx + 1:]
 
             exostive_solve_req(letters_left[1:], new_digits_left)
-            res_dict[char] = None
-            res_dict['iterations'] += 1
+            puzzle.result_dict[char] = None
+            puzzle.result_dict['iterations'] += 1
 
         return False
 
     exostive_solve_req(letters_left, digits_left)
-    print(res_dict)
+    print(puzzle)
 
 
 def main(info_type: int, info_sourse: str):
