@@ -8,19 +8,25 @@ class Crosssword:
         """
         initlize variables
         """
-        # self.board = [["" for _ in range(size[1])] for _ in range(size[0])]
+        self.board = [["" for _ in range(size[1])] for _ in range(size[0])]
+
+        # self.board = [["x", "a", "b", "a", "c"],
+                    #   ["a", "b", "a", "c", "a"],
+                    #   ["b", "a", "x", "a", "d"],
+                    #   ["a", "c", "a", "r", "i"],
+                    #   ["c", "a", "d", "", ""]]
 
         # for 5x4 board
-        # self.board = [["z", "y", "m", "e"], 
-        #               ["y", "o", "u", "l"], 
-        #               ["g", "u", "r", "u"], 
-        #               ["a", "v", "i", "d"],
-        #               ["l", "e", "", ""]]
+        self.board = [["z", "y", "m", "e"], 
+                      ["y", "o", "u", "l"], 
+                      ["g", "u", "r", "u"], 
+                      ["a", "v", "i", "d"],
+                      ["l", "e", "", ""]]
 
         # for 3x4 board
-        self.board = [['s', 'o', 'r', 'a'],
-                      ['a', 'l', 'a', 's'],
-                      ['a', 'm', '', '']]
+        # self.board = [['s', 'o', 'r', 'a'],
+        #               ['a', 'l', 'a', 's'],
+        #               ['a', 'm', '', '']]
 
         self.size = size
         self.list = []
@@ -34,8 +40,8 @@ class Crosssword:
         """
         file = open(self.path)
         lst = file.readlines()
-        self.row_list = list(filter(lambda x: len(x[:-1]) == self.size[1], lst))
-        self.col_list = list(filter(lambda x: len(x[:-1]) == self.size[0], lst))
+        self.row_list = list(filter(lambda x: len(x.replace("\n", "")) == self.size[1], lst))
+        self.col_list = list(filter(lambda x: len(x.replace("\n", "")) == self.size[0], lst))
   
     def clear(self, position):
         """
@@ -102,6 +108,8 @@ class Crosssword:
         if row_lst != []:
             row_word = row_lst[-1]
 
+        if len(row_word) == self.size[0]:
+            row_word = ""
         for i in range(97, 122):
             dct[chr(i)] = self.best_match(row_word, self.row_list)[chr(i)]
 
@@ -122,7 +130,10 @@ class Crosssword:
                     col -= 1
                 self.clear([row, col])
                 lst = self.get_dict()
-                self.used_letters[row, col] += 1
+                try:
+                    self.used_letters[row, col] += 1
+                except KeyError:
+                    print("There are no words for this format!")
                 for _ in range(self.used_letters[row, col]):
                     if lst == False:
                         return add_letter(lst, row, col)
@@ -160,9 +171,9 @@ class Crosssword:
         
         return self.board
 
+
 if __name__ == '__main__':
-    c = Crosssword((3, 4), "/home/master/ucu/semester2/discrete_project/words.txt")
-    # c = Crosssword((5, 4), "/home/master/ucu/semester2/discrete_project/words.txt")
+    c = Crosssword((5, 4), "backtracking-team-project/crossword/words.txt")
     c.word_lists()
     for row in c.fill_board():
         print(row)
