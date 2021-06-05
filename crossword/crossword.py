@@ -17,13 +17,13 @@ class Crosssword:
                     #   ["c", "a", "d", "", ""]]
 
         # for 5x4 board
-        self.board = [["z", "y", "m", "e"], 
-                      ["y", "o", "u", "l"], 
-                      ["g", "u", "r", "u"], 
-                      ["a", "v", "i", "d"],
-                      ["l", "e", "", ""]]
+        # self.board = [["z", "y", "m", "e"], 
+        #               ["y", "o", "u", "l"], 
+        #               ["g", "u", "r", "u"], 
+        #               ["a", "v", "i", "d"],
+        #               ["l", "e", "", ""]]
 
-        # for 3x4 board
+        # # for 3x4 board
         # self.board = [['s', 'o', 'r', 'a'],
         #               ['a', 'l', 'a', 's'],
         #               ['a', 'm', '', '']]
@@ -133,7 +133,7 @@ class Crosssword:
                 try:
                     self.used_letters[row, col] += 1
                 except KeyError:
-                    print("There are no words for this format!")
+                    return "There are no words for this format!"
                 for _ in range(self.used_letters[row, col]):
                     if lst == False:
                         return add_letter(lst, row, col)
@@ -173,7 +173,8 @@ class Crosssword:
 
 
 if __name__ == '__main__':
-    c = Crosssword((5, 4), "backtracking-team-project/crossword/words.txt")
+    # d onot forget to adjust right size!!
+    c = Crosssword((3, 4), "backtracking-team-project/crossword/words.txt")
     c.word_lists()
     for row in c.fill_board():
         print(row)
